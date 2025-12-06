@@ -4,7 +4,7 @@ const PriorityQueue = require('./PriorityQueue');
 
 const app = express();
 // It must check 'process.env.PORT' first!
-const PORT = process.env.PORT ?? 3000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(bodyParser.json());
