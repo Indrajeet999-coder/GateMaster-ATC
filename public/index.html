@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GateMaster - Airport Gate Assignment System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background-image: url('https://images.unsplash.com/photo-1473862170180-84427c485aca?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            margin-bottom: 40px;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.9));
+        }
+
+        .hero-title {
+            position: relative;
+            z-index: 1;
+            font-size: 4rem;
+            font-weight: 400;
+            color: #ffffff;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+            letter-spacing: 3px;
+            font-family: 'Share Tech Mono', monospace;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .hero-title-icon {
+            width: 60px;
+            height: 60px;
+            stroke: #06b6d4;
+            fill: none;
+            stroke-width: 2;
+            filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.6));
+        }
+
+        .header-widgets {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .digital-widget {
+            background-color: rgba(15, 23, 42, 0.85);
+            border: 2px solid #06b6d4;
+            padding: 12px 20px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #06b6d4;
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+        }
+
+        .utc-clock {
+            font-size: 1.2rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            min-width: 180px;
+            text-align: center;
+        }
+
+        .terminal-status {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            color: #10b981;
+            min-width: 220px;
+        }
+
+        .blink-dot {
+            animation: blinker 1.5s infinite;
+        }
+
+        @keyframes blinker {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        /* Control Panel - Industrial Style */
+        .control-panel {
+            background: #1e293b;
+            padding: 25px 30px;
+            border-radius: 0;
+            border: 2px solid #334155;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-panel label {
+            font-weight: 600;
+            color: #cbd5e1;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .control-panel input {
+            flex: 1;
+            min-width: 200px;
+            padding: 14px 18px;
+            border: 2px solid #475569;
+            border-radius: 0;
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .control-panel input:focus {
+            outline: none;
+            border-color: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+        }
+
+        .btn-assign {
+            background-color: #22c55e;
+            color: #0f172a;
+            border: 2px solid #22c55e;
+            padding: 14px 35px;
+            border-radius: 0;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-assign:hover {
+            background-color: #16a34a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(34, 197, 94, 0.4);
+        }
+
+        .btn-assign:active {
+            transform: translateY(0);
+        }
+
+        .btn-assign:disabled {
+            background-color: #475569;
+            border-color: #475569;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Gates Grid */
+        .gates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* Gate Cards - Dark Theme */
+        .gate-card {
+            background: #1e293b;
+            border-radius: 0;
+            padding: 25px;
+            border: 2px solid #334155;
+            transition: transform 0.2s, border-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .gate-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .gate-card.free {
+            border-left: 4px solid #22c55e;
+        }
+
+        .gate-card.busy {
+            border-left: 4px solid #ef4444;
+        }
+
+        .gate-id {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 15px;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
+
+        .gate-status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 0;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+        }
+
+        .status-free {
+            background-color: #22c55e;
+            color: #0f172a;
+            border: 2px solid #22c55e;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+
+        .status-busy {
+            background-color: #ef4444;
+            color: #ffffff;
+            border: 2px solid #ef4444;
+            animation: pulse-red 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.8), 0 0 30px rgba(239, 68, 68, 0.6);
+            }
+        }
+
+        .gate-info {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            line-height: 1.8;
+        }
+
+        .gate-info strong {
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+
+        .gate-info .grayed {
+            color: #64748b;
+        }
+
+        .gate-info .grayed strong {
+            color: #64748b;
+        }
+
+        .gate-info .flight-number {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #22c55e;
+        }
+
+        .timer {
+            margin-top: 15px;
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-weight: 600;
+            padding: 10px;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+        }
+
+        .timer.free {
+            color: #22c55e;
+            border-color: #22c55e;
+        }
+
+        .timer.busy {
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .message {
+            padding: 15px 20px;
+            border-radius: 0;
+            margin-bottom: 20px;
+            display: none;
+            font-weight: 600;
+            border: 2px solid;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .message.success {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border-color: #22c55e;
+            display: block;
+        }
+
+        .message.error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border-color: #ef4444;
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            /* Hero Banner - Stack vertically */
+            .hero-banner {
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                height: auto;
+                padding: 30px 20px;
+                gap: 20px;
+            }
+
+            /* Hero Title - Scale down font size */
+            .hero-title {
+                font-size: 2.5rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .hero-title-icon {
+                width: 50px;
+                height: 50px;
+            }
+
+            /* Header Widgets - Stack vertically */
+            .header-widgets {
+                flex-direction: column;
+                width: 100%;
+                gap: 15px;
+            }
+
+            .utc-clock,
+            .terminal-status {
+                width: 100%;
+                min-width: unset;
+            }
+
+            /* Container - Reduce padding */
+            .container {
+                padding: 0 10px 30px;
+            }
+
+            /* Control Panel - Stack vertically */
+            .control-panel {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 20px;
+                gap: 15px;
+            }
+
+            .control-panel label {
+                width: 100%;
+                text-align: center;
+            }
+
+            .control-panel input {
+                width: 100%;
+                min-width: unset;
+            }
+
+            .btn-assign {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-banner">
+        <h1 class="hero-title">
+            <svg class="hero-title-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Radar Dish Icon -->
+                <circle cx="50" cy="50" r="35" stroke="currentColor" fill="none" stroke-width="2"/>
+                <circle cx="50" cy="50" r="25" stroke="currentColor" fill="none" stroke-width="1.5" opacity="0.6"/>
+                <circle cx="50" cy="50" r="15" stroke="currentColor" fill="none" stroke-width="1" opacity="0.4"/>
+                <line x1="50" y1="15" x2="50" y2="50" stroke="currentColor" stroke-width="2"/>
+                <line x1="50" y1="50" x2="70" y2="30" stroke="currentColor" stroke-width="2"/>
+                <line x1="50" y1="50" x2="30" y2="30" stroke="currentColor" stroke-width="2"/>
+                <circle cx="50" cy="50" r="3" fill="currentColor"/>
+            </svg>
+            GateMaster Control
+        </h1>
+        <div class="header-widgets">
+            <div class="digital-widget utc-clock" id="utcClock">00:00:00 UTC</div>
+            <div class="digital-widget terminal-status">
+                <span class="blink-dot">●</span> TERMINAL 1: LIVE
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="control-panel">
+            <label for="flightNo">Flight #:</label>
+            <input type="text" id="flightNo" placeholder="Enter flight number (e.g., AA123)" />
+            <button class="btn-assign" id="assignBtn">Assign Gate</button>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <div id="gatesContainer" class="gates-grid">
+            <div class="loading">Loading gates...</div>
+        </div>
+    </div>
+
+    <script>
+        const flightNoInput = document.getElementById('flightNo');
+        const assignBtn = document.getElementById('assignBtn');
+        const gatesContainer = document.getElementById('gatesContainer');
+        const messageDiv = document.getElementById('message');
+
+        // Fetch gate status from API
+        async function fetchGateStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                return data.gates || [];
+            } catch (error) {
+                console.error('Error fetching gate status:', error);
+                return [];
+            }
+        }
+
+        // Format time difference
+        function formatTimeDifference(targetTime) {
+            const now = new Date();
+            const target = new Date(targetTime);
+            const diffMs = target - now;
+            const diffMins = Math.floor(Math.abs(diffMs) / 60000);
+            const diffSecs = Math.floor((Math.abs(diffMs) % 60000) / 1000);
+
+            if (diffMs <= 0) {
+                return 'AVAILABLE NOW';
+            } else {
+                return `AVAILABLE IN ${String(diffMins).padStart(2, '0')}M ${String(diffSecs).padStart(2, '0')}S`;
+            }
+        }
+
+        // Check if gate is free
+        function isGateFree(gate) {
+            const now = new Date();
+            const availableTime = new Date(gate.nextAvailableTime);
+            return availableTime <= now;
+        }
+
+        // Render gate cards
+        function renderGates(gates) {
+            if (!gates || gates.length === 0) {
+                gatesContainer.innerHTML = '<div class="loading">No gates available</div>';
+                return;
+            }
+
+            // Sort gates alphabetically for consistent display
+            const sortedGates = [...gates].sort((a, b) => a.gateId.localeCompare(b.gateId));
+
+            gatesContainer.innerHTML = sortedGates.map(gate => {
+                const isFree = isGateFree(gate);
+                const statusClass = isFree ? 'status-free' : 'status-busy';
+                const statusText = isFree ? 'FREE' : 'BUSY';
+                const timerClass = isFree ? 'free' : 'busy';
+                const timerText = formatTimeDifference(gate.nextAvailableTime);
+                const cardClass = isFree ? 'free' : 'busy';
+
+                // Flight display logic: only show flight number if gate is busy
+                let flightDisplay = '';
+                if (isFree) {
+                    // Gate is free - show "---" with grayed out label
+                    flightDisplay = '<div class="grayed"><strong>Flight:</strong> <span class="flight-number">---</span></div>';
+                } else if (gate.flightNo) {
+                    // Gate is busy - show actual flight number
+                    flightDisplay = `<div><strong>Flight:</strong> <span class="flight-number">${gate.flightNo}</span></div>`;
+                }
+
+                return `
+                    <div class="gate-card ${cardClass}">
+                        <div class="gate-id">${gate.gateId}</div>
+                        <div class="gate-status ${statusClass}">${statusText}</div>
+                        <div class="gate-info">
+                            ${flightDisplay}
+                            ${gate.aircraftSize && !isFree ? `<div><strong>Aircraft Size:</strong> ${gate.aircraftSize}</div>` : ''}
+                            <div class="timer ${timerClass}">${timerText}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Show message
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            setTimeout(() => {
+                messageDiv.className = 'message';
+            }, 5000);
+        }
+
+        // Assign gate
+        async function assignGate() {
+            const flightNo = flightNoInput.value.trim();
+            
+            if (!flightNo) {
+                showMessage('Please enter a flight number', 'error');
+                return;
+            }
+
+            assignBtn.disabled = true;
+            assignBtn.textContent = 'Assigning...';
+
+            try {
+                const response = await fetch('/api/assign-gate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        flightNo: flightNo,
+                        aircraftSize: 'Medium'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage(`Gate ${data.gate.gateId} assigned to flight ${flightNo}`, 'success');
+                    flightNoInput.value = '';
+                    // Refresh gate status immediately
+                    updateGates();
+                } else {
+                    showMessage(data.error || 'Failed to assign gate', 'error');
+                }
+            } catch (error) {
+                showMessage('Error assigning gate: ' + error.message, 'error');
+            } finally {
+                assignBtn.disabled = false;
+                assignBtn.textContent = 'Assign Gate';
+            }
+        }
+
+        // Update gates display
+        async function updateGates() {
+            const gates = await fetchGateStatus();
+            renderGates(gates);
+        }
+
+        // Event listeners
+        assignBtn.addEventListener('click', assignGate);
+        flightNoInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                assignGate();
+            }
+        });
+
+        // Update UTC Clock
+        function updateUTCClock() {
+            const now = new Date();
+            const hours = String(now.getUTCHours()).padStart(2, '0');
+            const minutes = String(now.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(now.getUTCSeconds()).padStart(2, '0');
+            document.getElementById('utcClock').textContent = `${hours}:${minutes}:${seconds} UTC`;
+        }
+
+        // Initial load
+        updateGates();
+        updateUTCClock();
+
+        // Poll for updates every 2 seconds
+        setInterval(updateGates, 2000);
+
+        // Update UTC clock every second
+        setInterval(updateUTCClock, 1000);
+    </script>
+</body>
+</html>
