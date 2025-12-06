@@ -3,7 +3,8 @@ const bodyParser = require('body-parser');
 const PriorityQueue = require('./PriorityQueue');
 
 const app = express();
-const PORT = 3000;
+// It must check 'process.env.PORT' first!
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(bodyParser.json());
